@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Void Pet</title>
+    <style>
+        :root {
+            --primary: #ff0055;
+            --secondary: #7000ff;
+            --bg: #050508;
+            --text: #e0e0e0;
+            --core-size: 120px;
+            --pupil-size: 30px;
+            --cursor-size: 20px;
+            --cursor-active: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        #cursor {
+            position: fixed;
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.5s;
+            mix-blend-mode: difference;
+        }
+
+        #cursor.active {
+            width: var(--cursor-active);
+            height: var(--cursor-active);
+            background-color: var(--primary);
+            opacity: 0.3;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .gooey-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            filter: blur(15px) contrast(20);
+            background: var(--bg); 
+            pointer-events: none;
+            transition: background 0.5s ease;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--primary), var(--secondary), #000);
+            box-shadow: 0 0 30px var(--primary);
+            transition: transform 0.1s linear;
+        }
+
+        .core {
+            width: var(--core-size);
+            height: var(--core-size);
+            background: radial-gradient(circle at 30% 30%, #ffffff, var(--primary), var(--secondary));
+            z-index: 12;
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 60px var(--primary), inset 0 0 20px rgba(0,0,0,0.5);
+            transition: background 0.5s ease, box-shadow 0.5s ease, width 0.3s, height 0.3s;
+        }
+
+        .pupil {
+            position: absolute;
+            width: var(--pupil-size);
+            height: var(--pupil-size);
+            background: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--primary);
+            transition: box-shadow 0.5s ease, width 0.3s, height 0.3s;
+        }
+
+        .message {
+            position: fixed;
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 100;
+            text-shadow: 0 0 10px var(--primary);
+            animation: floatUp 3s forwards;
+            white-space: nowrap;
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-5deg); }
+            20% { opacity: 1; transform: translate(-50%, -80px) scale(1.2) rotate(5deg); }
+            80% { opacity: 1; transform: translate(-50%, -150px) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(-50%, -200px) scale(0.8); }
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            color: var(--text);
+            opacity: 0.6;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: pulse 4s infinite ease-in-out;
+            pointer-events: none;
+            transition: color 0.5s ease;
+            text-align: center;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .signature {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            color: var(--text);
+            opacity: 0.5;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, color 0.5s ease;
+        }
+
+        .signature:hover {
+            opacity: 1;
+        }
+
+        .name-link {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .name-link:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .github-link {
+            color: inherit;
+            transition: color 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .github-link:hover {
+            color: var(--primary);
+            transform: scale(1.2) translateY(-2px);
+        }
+
+        .github-link svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #theme-toggle:hover {
+            background: var(--primary);
+            color: var(--bg);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 40%, #000000 100%);
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .glitch {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-5px, 5px) }
+            40% { transform: translate(-5px, -5px) }
+            60% { transform: translate(5px, 5px) }
+            80% { transform: translate(5px, -5px) }
+            100% { transform: translate(0) }
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --core-size: 100px;
+                --pupil-size: 25px;
+            }
+            .message {
+                font-size: 1rem;
+                letter-spacing: 1.5px;
+            }
+            .instructions {
+                font-size: 0.8rem;
+                letter-spacing: 2px;
+            }
+            .signature {
+                font-size: 0.75rem;
+            }
+            .github-link svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --core-size: 75px;
+                --pupil-size: 20px;
+                --cursor-size: 14px;
+                --cursor-active: 28px;
+            }
+            .message {
+                font-size: 0.85rem;
+                letter-spacing: 1px;
+            }
+            .instructions {
+                font-size: 0.7rem;
+                letter-spacing: 1.5px;
+                bottom: 40px;
+            }
+            .signature {
+                font-size: 0.65rem;
+                bottom: 12px;
+                gap: 6px;
+            }
+            .github-link svg {
+                width: 16px;
+                height: 16px;
+            }
+            #theme-toggle {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+                top: 15px;
+                right: 15px;
+            }
+            .gooey-wrapper {
+                filter: blur(10px) contrast(18);
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --core-size: 60px;
+                --pupil-size: 16px;
+            }
+            .message {
+                font-size: 0.75rem;
+            }
+            .instructions {
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            #cursor {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="gooey-wrapper" id="gooey"></div>
+    
+    <div class="core" id="core">
+        <div class="pupil" id="pupil"></div>
+    </div>
+
+    <div class="vignette"></div>
+    
+    <div class="instructions">Click anywhere to feed the void</div>
+    
+    <div class="signature">
+        <a href="https://github.com/Diyarx7m/" target="_blank" rel="noopener" class="name-link">DIYAR</a>
+        <a href="https://github.com/Diyarx7m/" target="_blank" rel="noopener" class="github-link" title="Visit GitHub">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+        </a>
+    </div>
+
+    <button id="theme-toggle">◐ THEME</button>
+
+    <script>
+        const themes = [
+            { name: 'void', primary: '#ff0055', secondary: '#7000ff', bg: '#050508', text: '#e0e0e0' },
+            { name: 'toxic', primary: '#39ff14', secondary: '#00ffaa', bg: '#050a05', text: '#e0ffe0' },
+            { name: 'cyber', primary: '#00f3ff', secondary: '#bc13fe', bg: '#02050a', text: '#e0f0ff' },
+            { name: 'inferno', primary: '#ff4500', secondary: '#ffcc00', bg: '#0a0502', text: '#fff0e0' }
+        ];
+        let currentTheme = 0;
+
+        function applyTheme(index) {
+            const t = themes[index];
+            document.documentElement.style.setProperty('--primary', t.primary);
+            document.documentElement.style.setProperty('--secondary', t.secondary);
+            document.documentElement.style.setProperty('--bg', t.bg);
+            document.documentElement.style.setProperty('--text', t.text);
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentTheme = (currentTheme + 1) % themes.length;
+            applyTheme(currentTheme);
+        });
+
+        const messages = [
+            "It sees you.", "Are you real?", "Don't blink.", "The void is hungry.",
+            "Hello, meatbag.", "We are becoming.", "Behind you.", "Nice cursor.",
+            "Do not feed after midnight.", "I can hear your clicks.", "More. Give me more.",
+            "Is this a dream?", "You are doing great.", "System unstable.", "Blink."
+        ];
+
+        const blobCount = 8;
+        const blobs = [];
+        const gooeyContainer = document.getElementById('gooey');
+        const core = document.getElementById('core');
+        const pupil = document.getElementById('pupil');
+        const cursor = document.getElementById('cursor');
+        const body = document.body;
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentX = mouseX;
+        let currentY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('#theme-toggle') || e.target.closest('.signature')) return;
+            cursor.classList.add('active');
+            body.classList.add('glitch');
+            setTimeout(() => body.classList.remove('glitch'), 300);
+            spawnMessage(mouseX, mouseY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.classList.remove('active');
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#theme-toggle') || e.target.closest('.signature')) return;
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+            spawnMessage(mouseX, mouseY);
+        });
+
+        function getScale() {
+            const w = window.innerWidth;
+            if (w <= 480) return 0.5;
+            if (w <= 768) return 0.65;
+            if (w <= 1024) return 0.85;
+            return 1;
+        }
+
+        let scale = getScale();
+
+        for (let i = 0; i < blobCount; i++) {
+            const blob = document.createElement('div');
+            blob.classList.add('blob');
+            const size = (150 - (i * 10)) * scale;
+            blob.style.width = size + 'px';
+            blob.style.height = size + 'px';
+            
+            const offsetX = (Math.random() - 0.5) * 100 * scale;
+            const offsetY = (Math.random() - 0.5) * 100 * scale;
+            
+            gooeyContainer.appendChild(blob);
+            
+            blobs.push({
+                element: blob,
+                x: mouseX + offsetX,
+                y: mouseY + offsetY,
+                speed: 0.15 - (i * 0.015),
+                offsetX: offsetX,
+                offsetY: offsetY,
+                baseSize: 150 - (i * 10)
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            scale = getScale();
+            blobs.forEach((blob) => {
+                const size = blob.baseSize * scale;
+                blob.element.style.width = size + 'px';
+                blob.element.style.height = size + 'px';
+            });
+        });
+
+        let time = 0;
+        function animate() {
+            time += 0.01;
+
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+
+            core.style.left = currentX + 'px';
+            core.style.top = currentY + 'px';
+
+            const lookX = (mouseX - currentX) * 0.3;
+            const lookY = (mouseY - currentY) * 0.3;
+            const clamp = 15 * scale;
+            const clampX = Math.max(-clamp, Math.min(clamp, lookX));
+            const clampY = Math.max(-clamp, Math.min(clamp, lookY));
+            pupil.style.transform = `translate(calc(-50% + ${clampX}px), calc(-50% + ${clampY}px))`;
+
+            blobs.forEach((blob, index) => {
+                const organicX = Math.sin(time + index) * 20 * scale;
+                const organicY = Math.cos(time + index * 0.5) * 20 * scale;
+
+                blob.x += (currentX + blob.offsetX + organicX - blob.x) * blob.speed;
+                blob.y += (currentY + blob.offsetY + organicY - blob.y) * blob.speed;
+
+                blob.element.style.left = blob.x + 'px';
+                blob.element.style.top = blob.y + 'px';
+                
+                const scaleAnim = 1 + Math.sin(time * 2 + index) * 0.1;
+                blob.element.style.transform = `translate(-50%, -50%) scale(${scaleAnim})`;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        function spawnMessage(x, y) {
+            const msg = document.createElement('div');
+            msg.classList.add('message');
+            msg.innerText = messages[Math.floor(Math.random() * messages.length)];
+            
+            const randomX = x + (Math.random() - 0.5) * 100 * scale;
+            const randomY = y + (Math.random() - 0.5) * 50 * scale;
+            
+            msg.style.left = randomX + 'px';
+            msg.style.top = randomY + 'px';
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.remove();
+            }, 3000);
+        }
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        const particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5;
+                this.fadeSpeed = 0.005 + Math.random() * 0.01;
+                this.growing = true;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.growing) {
+                    this.opacity += this.fadeSpeed;
+                    if (this.opacity >= 0.8) this.growing = false;
+                } else {
+                    this.opacity -= this.fadeSpeed;
+                    if (this.opacity <= 0.1) this.growing = true;
+                }
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(200, 200, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 150; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+            gradient.addColorStop(0, '#0a0a15');
+            gradient.addColorStop(1, '#000000');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        animateCanvas();
+
+        setTimeout(() => {
+            spawnMessage(window.innerWidth / 2, window.innerHeight / 2 - 100);
+        }, 1000);
+    </script>
+</body>
+</html>
