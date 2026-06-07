@@ -1,15 +1,13 @@
 # funny-blob
 
-A tiny playground of single-file demos and playful web experiments.
+A tiny playground of single-file demos and playful web experiments.(enjoyyyyy)
 
-funny-blob contains short HTML/CSS/JS “blobs” — small, self-contained demos and prototypes intended for learning, experimentation, or just messing around.
+funny-blob contains short HTML/CSS/JS “blobs” — small self-contained demos and prototypes intended for learning, experimentation, or just messing around
 
 Key info
 
-- Owner: Diyarx7m
+- Owner: Diyar
 - Repository: Diyarx7m/funny-blob
-- Repo ID: 1261980970
-- Default branch: main
 - Primary language: HTML
 
 Quick start
@@ -21,7 +19,7 @@ git clone https://github.com/Diyarx7m/funny-blob.git
 cd funny-blob
 ```
 
-2. Open a demo file in your browser, for example:
+2. Open a demo file in your browser for example:
 
 ```text
 open funny-blob.html
@@ -42,8 +40,7 @@ What you’ll find
 
 Usage notes
 
-- These files are intended to be opened locally in your browser. Many demos are self-contained and do not require a build step.
-- If a demo requires Node.js or other tooling, check the file header or comments for instructions.
+- These files are intended to be opened locally in your browser. Many demos are self-contained and do not require a build step
 
 Contributing
 
@@ -56,12 +53,12 @@ Contributions are welcome. A suggested workflow:
 
 Tips for demos
 
-- Keep demos small and self-contained so others can open them directly in a browser.
-- Include brief usage notes and expected behavior in comments at the top of each file.
+- Keep demos small and self-contained so others can open them directly in a browser
+- Include brief usage notes and expected behavior in comments at the top of each file
 
 License
 
-No license file is included yet. Add a LICENSE (for example: MIT) if you want to allow reuse.
+(MIT)
 
 Useful links
 
@@ -70,8 +67,8 @@ Useful links
 
 Contact
 
-Author: https://github.com/Diyarx7m
+Author: https://github.com/Diyarx7m (DIYAR)
 
 ---
 
-(README updated by GitHub Copilot.)
+( MADE BY DIYAR)
