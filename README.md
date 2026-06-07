@@ -1,5 +1,12 @@
 # funny-blob
-
+```
+  ██████╗ ██╗██╗   ██╗ █████╗ ██████╗
+  ██╔══██╗██║╚██╗ ██╔╝██╔══██╗██╔══██╗
+  ██║  ██║██║ ╚████╔╝ ███████║██████╔╝
+  ██║  ██║██║  ╚██╔╝  ██╔══██║██╔══██╗
+  ██████╔╝██║   ██║   ██║  ██║██║  ██║
+  ╚═════╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝
+```
 A tiny playground of single-file demos and playful web experiments.(enjoyyyyy)
 
 funny-blob contains short HTML/CSS/JS “blobs” — small self-contained demos and prototypes intended for learning, experimentation, or just messing around
@@ -65,10 +72,7 @@ Useful links
 - Repository: https://github.com/Diyarx7m/funny-blob
 - Example demo: funny-blob.html
 
-Contact
+## Find me
 
-Author: https://github.com/Diyarx7m (DIYAR)
-
----
-
+[![Instagram](https://img.shields.io/badge/Instagram-@d7r.x__-1c1c1e?style=flat-square&logo=instagram&logoColor=white)](https://instagram.com/d7r.x_)
 ( MADE BY DIYAR)
